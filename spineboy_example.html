@@ -7,6 +7,9 @@
     <script>
         const app = new PIXI.Application();
         document.body.appendChild(app.view);
+      
+        let sprite = PIXI.Sprite.from('spineboy.png');
+        app.stage.addChild(sprite);
 
         // load spine data
         PIXI.Assets.load('spineboy.json').then(onAssetsLoaded);
