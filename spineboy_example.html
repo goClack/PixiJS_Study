@@ -9,7 +9,7 @@
         document.body.appendChild(app.view);
 
         // load spine data
-        PIXI.Assets.load('examples/assets/pixi-spine/spineboy.json').then(onAssetsLoaded);
+        PIXI.Assets.load('spineboy.json').then(onAssetsLoaded);
 
         function onAssetsLoaded(spineboyAsset) {
             app.stage.interactive = true;
