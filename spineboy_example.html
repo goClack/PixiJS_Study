@@ -5,10 +5,10 @@
   </head>
   <body>
     <script>
-        const app = new PIXI.Application();
+        const app = new PIXI.Application({ width: 800, height: 600 });
         document.body.appendChild(app.view);
       
-        let sprite = PIXI.Sprite.from('spineboy.png');
+        let sprite = PIXI.Sprite.from('sample.png');
         app.stage.addChild(sprite);
 
         // load spine data
