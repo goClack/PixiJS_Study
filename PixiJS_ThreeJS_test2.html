@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+	<head>
+        <script src="pixi_5.2.4/pixi.js"></script>
+		<script src="pixi-spine.js"></script>
+	</head>
+    <body>
+		<script type="module">
+			import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
+
+            //-------------------------------------------------------------------------------------
+			// 2D UI canvas
+			//-------------------------------------------------------------------------------------
+            let app = new PIXI.Application({ width: 1200, height: 800 });
+            document.body.appendChild(app.view);
+
+            app.loader.add('goblins', 'https://goclack.github.io/PixiJS_Study/goblins.json').load(goblinsLoad);
+
+            const bg_container = new PIXI.Container();
+            app.stage.addChild(bg_container);
+            bg_container.x = 10;
+            bg_container.y = 10;
+
+            // Create the sprite and add it to the stage
+            let bg_sprite2 = PIXI.Sprite.from('https://goclack.github.io/PixiJS_Study/mario_map.png');
+            bg_container.addChild(bg_sprite2);
+            bg_sprite2.height = 500;
+
+            //let bg_sprite = PIXI.Sprite.from('https://goclack.github.io/PixiJS_Study/sample.png');
+            //bg_container.addChild(bg_sprite);
+
+
+
+
+			
+			var scene_2D = new PIXI.Container();
+			app.stage.addChild(scene_2D);
+            scene_2D.x = 15;
+            scene_2D.y = 15;
+
+
+			//-------------------------------------------------------------------------------------
+			// 3D Scene canvas`
+			//-------------------------------------------------------------------------------------
+			var scene_3D = new THREE.Scene();
+
+			let width = 600;
+			let height = 300;
+
+			var camera = new THREE.PerspectiveCamera( 75, width / height, 1, 10000 );
+			camera.position.set( 0, 0, 700);
+
+			var canvas_3D = new THREE.WebGLRenderer( {antialias: true, alpha: true} );
+			canvas_3D.setSize( 600, 300 );
+            
+            const map_3 = new THREE.TextureLoader().load( 'https://goclack.github.io/PixiJS_Study/sample.png' );
+            
+            const uiMaterial = new THREE.MeshBasicMaterial({
+                map: map_3,
+                transparent: true,
+            });
+            const uiGeometry = new THREE.PlaneGeometry(512, 512, 512);
+            const uiMesh = new THREE.Mesh(uiGeometry, uiMaterial);
+            uiMesh.position.x = 300;
+            uiMesh.rotation.x = -45;
+            scene_3D.add(uiMesh);
+
+			//-------------------------------------------------------------------------------------
+			// Map 3D canvas to 2D Canvas
+			//-------------------------------------------------------------------------------------
+			var texture_3D = new PIXI.Texture.fromCanvas(canvas_3D.domElement);
+			var sprite_3D = new PIXI.Sprite(texture_3D);
+			scene_2D.addChild(sprite_3D);
+			sprite_3D.x = 10;
+			sprite_3D.y = 10;
+
+
+			//-------------------------------------------------------------------------------------
+			// Label the PIXI Canvas
+			//-------------------------------------------------------------------------------------
+
+            const top_container = new PIXI.Container();
+            app.stage.addChild(top_container);
+            top_container.x = 5;
+            top_container.y = 5;
+
+			var label = new PIXI.Text("PIXI Canvas",{fontSize: 24, fill : 0xffffff})
+			label.position.set(10,10);
+			top_container.addChild(label)
+
+            var label2 = new PIXI.Text("PIXI Canvas",{fontSize: 24, fill : 0xff0000})
+			label2.position.set(11,11);
+			bg_container.addChild(label2)
+
+            /*
+            const brt = new PIXI.BaseRenderTexture(300, 300, PIXI.SCALE_MODES.LINEAR, 1);
+            const rt = new PIXI.RenderTexture(brt);
+            const plane = new PIXI.Sprite(rt);
+            //const plane = new PIXI.SimplePlane(rt, 10, 10);
+            plane.x = 100;
+            plane.y = 100;
+            bg_container.addChild(plane);
+            */
+
+            // Get the buffer for vertice positions.
+            //const buffer = plane.geometry.getBuffer('aVertexPosition');
+
+            const pixiRenderer = PIXI.autoDetectRenderer(800, 600, { transparent: true });
+            let sprite_2d = PIXI.Sprite.from(pixiRenderer.view);
+            bg_container.addChild(sprite_2d);
+            sprite_2d.x = 500;
+            //sprite_2d.rotation.x = 20;
+
+            const pixiRendererTexture = new THREE.Texture(pixiRenderer.view);
+            const pixiRendererMaterial = new THREE.MeshBasicMaterial({
+                map: pixiRendererTexture,
+                transparent: true,
+            });
+
+            const pixiRendererGeometry = new THREE.PlaneGeometry(512, 512, 512);
+            const pixiRendererMesh = new THREE.Mesh(pixiRendererGeometry, pixiRendererMaterial);
+            //const pixiRendererMesh = new THREE.Mesh(uiGeometry, uiMaterial);
+            pixiRendererMesh.position.x = -300;
+            pixiRendererMesh.rotation.x = -45;
+            scene_3D.add(pixiRendererMesh);
+
+			//-------------------------------------------------------------------------------------
+			// Render Animation
+			//-------------------------------------------------------------------------------------
+			function animate() {
+				//cube.rotation.x += 0.01
+                //cube.rotation.y += 0.01
+                //cube.rotation.z += 0.01
+
+                //uiMesh.rotation.x += 0.01
+
+                //pixiRenderer.render(scene_2D);
+                pixiRenderer.render( app.stage );
+                canvas_3D.render( scene_3D, camera )
+                sprite_3D.texture.update() //tell pixi that threejs changed
+                requestAnimationFrame( animate )
+
+            }
+			animate();
+
+            function goblinsLoad( loader, resources) 
+            {
+                const goblin = new PIXI.spine.Spine(resources.goblins.spineData);
+
+                // set current skin
+                goblin.skeleton.setSkinByName('goblin');
+                goblin.skeleton.setSlotsToSetupPose();
+
+                // set the position
+                goblin.x = 100;
+                goblin.y = 500;
+
+                goblin.scale.set(1.5);
+
+                // play animation
+                goblin.state.setAnimation(0, 'walk', true);
+
+                top_container.addChild(goblin);
+                //pixiRoot.addChild(goblin);
+            }
+
+            function simplePlaneLoad( loader, reousrces )
+            {
+                const plane = new PIXI.SimplePlane(reousrces, 10, 10);
+
+                plane.x = 100;
+                plane.y = 100;
+
+                top_container.addChild(plane);
+
+                const buffer = plane.geometry.getBuffer('aVertexPosition');
+                buffer.data[2] += 10;
+
+                buffer.update();
+            }
+
+        </script>
+	</body>
+</html>
