@@ -1,15 +1,12 @@
+
 const app = new PIXI.Application();
 document.body.appendChild(app.view);
 
-// load spine data
-PIXI.Assets.load('examples/assets/pixi-spine/goblins.json').then(onAssetsLoaded);
+app.loader.add('goblins', 'https://goclack.github.io/PixiJS_Study/goblins.json').load(goblinsLoad);
 
-
-function onAssetsLoaded(goblinAsset) {
-    app.stage.interactive = true;
-    app.stage.cursor = 'pointer';
-
-    const goblin = new PIXI.spine.Spine(goblinAsset.spineData);
+function goblinsLoad( loader, resources) 
+{
+    const goblin = new PIXI.spine.Spine(resources.goblins.spineData);
 
     // set current skin
     goblin.skeleton.setSkinByName('goblin');
@@ -25,12 +22,4 @@ function onAssetsLoaded(goblinAsset) {
     goblin.state.setAnimation(0, 'walk', true);
 
     app.stage.addChild(goblin);
-
-    app.stage.on('pointertap', () => {
-    // change current skin
-        const currentSkinName = goblin.skeleton.skin.name;
-        const newSkinName = (currentSkinName === 'goblin' ? 'goblingirl' : 'goblin');
-        goblin.skeleton.setSkinByName(newSkinName);
-        goblin.skeleton.setSlotsToSetupPose();
-    });
 }
