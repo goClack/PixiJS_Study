@@ -6,3 +6,6 @@ test url : https://goclack.github.io/PixiJS_Study/PixiJS_Guides_1.html
 
 Pixi Spine
 test url : https://goclack.github.io/PixiJS_Study/goblins_example.html
+
+
+test url : https://goclack.github.io/PixiJS_Study/PixiJS_ThreeJS_test2.html
